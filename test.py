@@ -488,10 +488,12 @@ def consumer_old():
     return Response(event_stream(), mimetype="text/event-stream")
 
 def run_flask():
-    port = int(os.environ.get("PORT", 9384))  # Render sets PORT env variable
+    port = int(3000)  # Render sets PORT env variable
+    if not port:
+    	port = 8080
     #cert_file = os.path.join(os.path.dirname(__file__), "ssl.crt/server.crt")
     #key_file = os.path.join(os.path.dirname(__file__), "ssl.key/server.key")
-    app.run( port=port,debug=False, use_reloader=False)
+    app.run( host="0.0.0.0", port=port,debug=False, use_reloader=False)
 
 
 #new running main
