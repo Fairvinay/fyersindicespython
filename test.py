@@ -322,7 +322,7 @@ def stream():
         try:
             while True:
                 try:
-                   msg = ServerThreadSelfManage.message_queue.get(timeout=30)
+                   msg = ServerThreadSelfManage.message_queue.get(timeout=1)
                    if msg is None:
                       yield "data: heartbeat\n\n"
                    else:
@@ -352,7 +352,7 @@ def stream():
         """
         return Response(event_stream(), mimetype="text/event-stream")
 
-    return Response(event_stream(), mimetype="text/event-stream")
+    return Response(event_stream(), mimetype="text/event-stream",headers={"Cache-Control": "no-cache","Connection": "keep-alive","X-Accel-Buffering": "no"})
     """ 
     try:
         # Create producer and consumer threads

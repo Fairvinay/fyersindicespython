@@ -8,7 +8,7 @@ from fyers_apiv3.FyersWebsocket import data_ws
 
 class ServerThreadSelfManage(threading.Thread):
     _instance = None
-    message_queue = queue.Queue()   # <-- class-level queue accessible outside
+    message_queue = queue.Queue(maxsize=1000)   # <-- class-level queue accessible outside
 
     def __init__(self):
         super().__init__(daemon=True)
@@ -33,16 +33,32 @@ class ServerThreadSelfManage(threading.Thread):
             print("📡 Starting WebSocket with access_token...")
 
             def onmessage(message):
-                ServerThreadSelfManage.message_queue.put(f"data: {json.dumps(message)}\n\n")
-                print("Response:", message)
-
+            	try:
+                   ServerThreadSelfManage.message_queue.put(f"data: {json.dumps(message)}\n\n")
+                   print("Response:", message)
+                except queue.Full:
+                   ServerThreadSelfManage.message_queue.get_nowait()
+                   ServerThreadSelfManage.message_queue.put(msg)
+                    
             def onerror(message):
-                ServerThreadSelfManage.message_queue.put(f"data: {json.dumps(message)}\n\n")
-                print("Error:", message)
+                #ServerThreadSelfManage.message_queue.put(f"data: {json.dumps(message)}\n\n")
+                try:
+                   ServerThreadSelfManage.message_queue.put(f"data: {json.dumps(message)}\n\n")
+                   print("Error:", message)
+                except queue.Full:
+                   ServerThreadSelfManage.message_queue.get_nowait()
+                   ServerThreadSelfManage.message_queue.put(msg)
+                
 
             def onclose(message):
-                ServerThreadSelfManage.message_queue.put(f"data: {json.dumps(message)}\n\n")
-                print("Connection closed:", message)
+                #ServerThreadSelfManage.message_queue.put(f"data: {json.dumps(message)}\n\n")
+                try:
+                   ServerThreadSelfManage.message_queue.put(f"data: {json.dumps(message)}\n\n")
+                   print("Connection closed:", message)
+                except queue.Full:
+                   ServerThreadSelfManage.message_queue.get_nowait()
+                   ServerThreadSelfManage.message_queue.put(msg)
+                
 
             def onopen():
                 data_type = "SymbolUpdate"
