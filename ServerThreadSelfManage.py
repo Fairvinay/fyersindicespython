@@ -50,6 +50,7 @@ class ServerThreadSelfManage(threading.Thread):
                     symbols = self.tickers
                 else:
                     symbols = ["BSE:SENSEX-INDEX", "NSE:NIFTY50-INDEX", "NSE:NIFTYBANK-INDEX"]
+                    self.tickers = symbols
 
                 fyers.subscribe(symbols=symbols, data_type=data_type)
                 ServerThreadSelfManage.message_queue.put(f"data: {json.dumps('connected')}\n\n")
@@ -66,7 +67,7 @@ class ServerThreadSelfManage(threading.Thread):
                 on_message=onmessage
             )
 
-            fyers.keep_running()
+            #fyers.keep_running()
             fyers.connect()
 
             await asyncio.sleep(5)

@@ -321,10 +321,14 @@ def stream():
     def event_stream():
         try:
             while True:
-                msg = ServerThreadSelfManage.message_queue.get()
-                if msg is None:
-                    break
-                yield msg
+                try:
+                   msg = ServerThreadSelfManage.message_queue.get(timeout=30)
+                   if msg is None:
+                      yield "data: heartbeat\n\n"
+                   else:
+                      yield msg
+                except:
+                   yield "data: heartbeat\n\n"
         except GeneratorExit:
             # This happens when client disconnects
             print("⚠️ Client disconnected from /stream")
